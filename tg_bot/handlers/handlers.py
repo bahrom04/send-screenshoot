@@ -1,11 +1,22 @@
+import os
+
 from aiogram import Router
+from aiogram import Bot
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
-from aiogram.methods import send_photo
+from aiogram.types import Message, CallbackQuery, InputMedia
 
 from tg_bot.keyboards.keyboards import main_menu, go_back, cources
 from utils import static
 from users.models import User
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+TOKEN = os.getenv("BOT_TOKEN")
+bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
 start_router = Router()
 
@@ -37,9 +48,17 @@ async def main_callback_query(callback_query: CallbackQuery):
             text=static.admin_contact, reply_markup=await go_back()
         )
     elif callback_data == "cources":
-        await callback_query.message.edit_text(
-            text=static.cources_info, reply_markup=await cources()
+        path = f"./utils/images/tariflar-test.jpeg"
+        path = open(file=path, mode="rb")
+        template = InputMedia(path)
+        await bot.send_photo(
+            chat_id=callback_query.from_user.id,
+            photo=template,
+            reply_markup=await cources(),
+            caption=static.cources_info,
         )
+        # callback_query.message.answer_photo
+
     elif callback_data == "go_back":
         await callback_query.message.answer(
             text=static.main_menu_title, reply_markup=await main_menu()

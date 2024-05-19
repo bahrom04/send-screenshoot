@@ -5,6 +5,7 @@ async def main_menu() -> InlineKeyboardMarkup:
     buttons = [
         [InlineKeyboardButton(text="About me", callback_data="about_me")],
         [InlineKeyboardButton(text="Admin", callback_data="admin")],
+        [InlineKeyboardButton(text="Kurslar", callback_data="cources")],
     ]
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
