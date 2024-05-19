@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, InputMedia
+from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from tg_bot.keyboards.keyboards import main_menu, go_back, cources
 from utils import static
@@ -43,21 +43,20 @@ async def main_callback_query(callback_query: CallbackQuery):
         await callback_query.message.edit_text(
             text=static.about_me_title, reply_markup=await go_back()
         )
+
     elif callback_data == "admin":
         await callback_query.message.edit_text(
             text=static.admin_contact, reply_markup=await go_back()
         )
+        
     elif callback_data == "cources":
-        path = f"./utils/images/tariflar-test.jpeg"
-        path = open(file=path, mode="rb")
-        template = InputMedia(path)
+        photo = FSInputFile(path="utils/images/tariflar-test.jpeg", filename="tariflar")
         await bot.send_photo(
             chat_id=callback_query.from_user.id,
-            photo=template,
+            photo=photo,
             reply_markup=await cources(),
             caption=static.cources_info,
         )
-        # callback_query.message.answer_photo
 
     elif callback_data == "go_back":
         await callback_query.message.answer(
