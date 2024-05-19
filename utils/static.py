@@ -15,4 +15,4 @@ about_me_title = """Невозможно направлять кого-то на
 
 admin_contact = "https://t.me/kedi_uz"
 
-
+cources_info = """Quyidagi tariflarni tanlang"""

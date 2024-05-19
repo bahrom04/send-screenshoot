@@ -22,10 +22,14 @@ async def go_back() -> InlineKeyboardMarkup:
     return keyboard
 
 
+async def cources() -> InlineKeyboardMarkup:
 
+    buttons = [
+        [InlineKeyboardButton(text="Standart", callback_data="go_back")],
+        [InlineKeyboardButton(text="Premium", callback_data="go_back")],
+        [InlineKeyboardButton(text="Vip", callback_data="go_back")],
+    ]
 
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
-
-
-
-
+    return keyboard

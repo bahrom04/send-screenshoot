@@ -1,9 +1,10 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
+from aiogram.methods import send_photo
 
-from tg_bot.keyboards.keyboards import main_menu, go_back
-from tg_bot.keyboards import static
+from tg_bot.keyboards.keyboards import main_menu, go_back, cources
+from utils import static
 from users.models import User
 
 start_router = Router()
@@ -34,6 +35,10 @@ async def main_callback_query(callback_query: CallbackQuery):
     elif callback_data == "admin":
         await callback_query.message.edit_text(
             text=static.admin_contact, reply_markup=await go_back()
+        )
+    elif callback_data == "cources":
+        await callback_query.message.edit_text(
+            text=static.cources_info, reply_markup=await cources()
         )
     elif callback_data == "go_back":
         await callback_query.message.answer(
