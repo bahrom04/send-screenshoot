@@ -1,5 +1,6 @@
 from django.db import models
 from aiogram.types import Message
+from asgiref.sync import sync_to_async
 
 from utils.info import extract_user_data_from_update
 
@@ -13,76 +14,51 @@ class BaseModel(models.Model):
 
 
 class User(BaseModel):
-    user_id = models.PositiveBigIntegerField(primary_key=True)  # telegram_id
-    username = models.CharField(max_length=32)
-    first_name = models.CharField(max_length=256)
-    last_name = models.CharField(max_length=256)
-    language_code = models.CharField(max_length=8, help_text="Telegram client's lang")
-    deep_link = models.CharField(max_length=64)
-
-    # language = models.CharField(
-    #     max_length=2,
-    #     choices=LangaugeChoices.choices,
-    #     null=True,
-    #     blank=True,
-    # )
-
+    user_id = models.PositiveBigIntegerField(primary_key=True)
+    username = models.CharField(max_length=32, null=True, blank=True)
+    first_name = models.CharField(max_length=256, null=True, blank=True)
+    last_name = models.CharField(max_length=256, null=True, blank=True)
+    language_code = models.CharField(max_length=8, help_text="Telegram client's lang", null=True, blank=True)
+    deep_link = models.CharField(max_length=64, null=True, blank=True)
     is_blocked_bot = models.BooleanField(default=False)
-
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"@{self.username}" if self.username is not None else f"{self.user_id}"
+        return f"@{self.username}" if self.username else f"{self.user_id}"
 
     @classmethod
-    def get_user_and_created(cls, message: Message) -> list:
-        """python-telegram-bot's Update, Context --> User instance"""
+    async def get_user_and_created(cls, message: Message):
+        """Get or create a User instance from a Message."""
         data = extract_user_data_from_update(message)
-        u, created = cls.objects.update_or_create(
+        user, created = await sync_to_async(cls.objects.update_or_create)(
             user_id=data["user_id"], defaults=data
         )
-
-        # if created:
-        #     # Save deep_link to User model
-        #     if (
-        #         context is not None
-        #         and context.args is not None
-        #         and len(context.args) > 0
-        #     ):
-        #         payload = context.args[0]
-        #         if (
-        #             str(payload).strip() != str(data["user_id"]).strip()
-        #         ):  # you can't invite yourself
-        #             u.deep_link = payload
-        #             u.save()
-
-        return u, created
+        return user, created
 
     @classmethod
-    def get_user(cls, message: Message) -> int:
-        u = cls.get_user_and_created(message)
-        return u
+    async def get_user(cls, message: Message):
+        """Retrieve a User instance, creating it if necessary."""
+        user, _ = await cls.get_user_and_created(message)
+        return user
 
     @classmethod
-    def get_user_by_username_or_user_id(cls, username_or_user_id):
-        """Search user in DB, return User or None if not found"""
-        username = str(username_or_user_id).replace("@", "").strip().lower()
-        if username.isdigit():  # user_id
-            return cls.objects.filter(user_id=int(username)).first()
-        return cls.objects.filter(username__iexact=username).first()
+    async def get_user_by_username_or_user_id(cls, username_or_user_id):
+        """Search for a user in the database by username or user_id."""
+        identifier = str(username_or_user_id).replace("@", "").strip().lower()
+        if identifier.isdigit():  # user_id
+            return await sync_to_async(cls.objects.filter(user_id=int(identifier)).first)()
+        return await sync_to_async(cls.objects.filter(username__iexact=identifier).first)()
 
     @property
     def invited_users(self):
+        """Return users who were invited by this user."""
         return User.objects.filter(
             deep_link=str(self.user_id), created_at__gt=self.created_at
         )
 
     @property
     def tg_str(self) -> str:
+        """Return a string representation of the user for Telegram."""
         if self.username:
             return f"@{self.username}"
-        return (
-            f"{self.first_name} {self.last_name}"
-            if self.last_name
-            else f"{self.first_name}"
-        )
+        return f"{self.first_name} {self.last_name}".strip()

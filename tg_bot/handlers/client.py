@@ -17,7 +17,7 @@ async def command_start_handler(message: Message) -> None:
     print("------------------------")
     print(message.from_user)
     print("------------------------")
-    u = User.get_user_and_created(message)
+    u = await User.get_user_and_created(message)
     
     await message.answer(text=static.main_menu_title, reply_markup=await main_menu())
 
