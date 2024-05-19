@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
-from tg_bot.keyboards.client import main_menu, go_back
+from tg_bot.keyboards.keyboards import main_menu, go_back
 from tg_bot.keyboards import static
 from users.models import User
 
@@ -14,11 +14,9 @@ async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
-    print("------------------------")
-    print(message.from_user)
-    print("------------------------")
+
     u = await User.get_user_and_created(message)
-    
+
     await message.answer(text=static.main_menu_title, reply_markup=await main_menu())
 
 
