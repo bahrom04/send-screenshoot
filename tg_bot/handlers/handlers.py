@@ -6,7 +6,9 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
-from tg_bot.keyboards.keyboards import main_menu, go_back, cources
+from tg_bot.keyboards.keyboards import main_menu, go_back, cources, payment_button
+from tg_bot.keyboards import keyboards
+
 from utils import static
 from users.models import User
 
@@ -48,7 +50,7 @@ async def main_callback_query(callback_query: CallbackQuery):
         await callback_query.message.edit_text(
             text=static.admin_contact, reply_markup=await go_back()
         )
-        
+
     elif callback_data == "cources":
         photo = FSInputFile(path="utils/images/tariflar-test.jpeg", filename="tariflar")
         await bot.send_photo(
@@ -58,6 +60,21 @@ async def main_callback_query(callback_query: CallbackQuery):
             caption=static.cources_info,
         )
 
+    elif callback_data == "standart":
+        await callback_query.message.answer(
+            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        )
+
+    elif callback_data == "premium":
+        await callback_query.message.answer(
+            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        )
+
+    elif callback_data == "vip":
+        await callback_query.message.answer(
+            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        )
+
     elif callback_data == "go_back":
         await callback_query.message.answer(
             text=static.main_menu_title, reply_markup=await main_menu()
@@ -65,3 +82,17 @@ async def main_callback_query(callback_query: CallbackQuery):
 
     # Acknowledge the callback query to remove the loading spinner
     await callback_query.answer()
+
+
+# @start_router.callback_query()
+# async def cources_callback_query(callback_query: CallbackQuery):
+#     """
+#     This handler receives callback queries from cources inline keyboards
+#     """
+
+#     callback_data = callback_query.data
+
+#     if callback_data == "Standart":
+#         await callback_query.message.edit_text(
+#             text="pulni tolabsizmi?", reply_markup=await keyboards.payment_button()
+#         )
