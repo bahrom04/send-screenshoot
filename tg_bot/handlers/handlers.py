@@ -7,7 +7,6 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from tg_bot.keyboards.keyboards import main_menu, go_back, cources, payment_button
-from tg_bot.keyboards import keyboards
 
 from utils import static
 from users.models import User
@@ -84,15 +83,3 @@ async def main_callback_query(callback_query: CallbackQuery):
     await callback_query.answer()
 
 
-# @start_router.callback_query()
-# async def cources_callback_query(callback_query: CallbackQuery):
-#     """
-#     This handler receives callback queries from cources inline keyboards
-#     """
-
-#     callback_data = callback_query.data
-
-#     if callback_data == "Standart":
-#         await callback_query.message.edit_text(
-#             text="pulni tolabsizmi?", reply_markup=await keyboards.payment_button()
-#         )
