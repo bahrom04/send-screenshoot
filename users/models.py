@@ -18,7 +18,9 @@ class User(BaseModel):
     username = models.CharField(max_length=32, null=True, blank=True)
     first_name = models.CharField(max_length=256, null=True, blank=True)
     last_name = models.CharField(max_length=256, null=True, blank=True)
-    language_code = models.CharField(max_length=8, help_text="Telegram client's lang", null=True, blank=True)
+    language_code = models.CharField(
+        max_length=8, help_text="Telegram client's lang", null=True, blank=True
+    )
     deep_link = models.CharField(max_length=64, null=True, blank=True)
     is_blocked_bot = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -46,8 +48,12 @@ class User(BaseModel):
         """Search for a user in the database by username or user_id."""
         identifier = str(username_or_user_id).replace("@", "").strip().lower()
         if identifier.isdigit():  # user_id
-            return await sync_to_async(cls.objects.filter(user_id=int(identifier)).first)()
-        return await sync_to_async(cls.objects.filter(username__iexact=identifier).first)()
+            return await sync_to_async(
+                cls.objects.filter(user_id=int(identifier)).first
+            )()
+        return await sync_to_async(
+            cls.objects.filter(username__iexact=identifier).first
+        )()
 
     @property
     def invited_users(self):
@@ -62,5 +68,20 @@ class User(BaseModel):
         if self.username:
             return f"@{self.username}"
         return f"{self.first_name} {self.last_name}".strip()
-    
 
+
+class Plan(BaseModel):
+    title = models.CharField(max_length=255, verbose_name="Kurs nomi")
+
+    class Meta:
+        verbose_name = "Telegram Kurslar Tarifi"
+
+
+class UserPayment(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+
+    screenshot = models.ImageField(upload_to="screenshots/")
+
+    class Meta:
+        verbose_name = "User kursga tolovlari"

@@ -12,7 +12,6 @@ from tg_bot.keyboards.keyboards import (
     go_back,
     cources,
     payment_button,
-    
 )
 
 from utils import static
