@@ -47,7 +47,7 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(text=static.main_menu_title, reply_markup=await main_menu())
 
 
-@start_router.message(ContentType.PHOTO)
+@start_router.message()
 async def receive_payment_check(message: Message):
     """
     This handler receives payment check screenshots from the user
