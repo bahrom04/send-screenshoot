@@ -71,11 +71,13 @@ class User(BaseModel):
 
 
 class Plan(BaseModel):
-    title = models.CharField(max_length=255, verbose_name="Kurs nomi")
+    title = models.CharField(
+        max_length=255, verbose_name="Kurs nomi", blank=True, null=True
+    )
 
     def __str__(self) -> str:
         return self.title
-    
+
     class Meta:
         verbose_name = "Telegram Kurslar Tarifi"
 
@@ -83,24 +85,25 @@ class Plan(BaseModel):
 class UserPayment(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments")
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name="payments")
-
     screenshot = models.ImageField(upload_to="screenshots/", blank=True, null=True)
 
     def __str__(self) -> str:
-        return f"{self.user.user_id} ni {self.plan.title} ga to'lovi"
+        return f"{self.user.user_id}'s payment for {self.plan.title}"
 
     @classmethod
-    async def get_payment_and_created(
-        cls, callback_query: CallbackQuery, plan_id: int, photo_file_id: str
-    ):
-        """Get or create a User Payment instance from a CallbackQuery."""
-        data = extract_user_data_from_callback(callback_query)
-        user = await User.get_user(callback_query.message)
-        plan = await sync_to_async(Plan.objects.get)(pk=plan_id)
+    async def get_payment_and_created(cls, user, plan_title, screenshot):
+        """Get or create a User Payment instance."""
+        plan = await sync_to_async(Plan.objects.get)(title=plan_title)
         payment, created = await sync_to_async(cls.objects.update_or_create)(
-            user=user, plan=plan, defaults={"screenshot": photo_file_id}
+            user=user, plan=plan, screenshot=screenshot
         )
         return payment, created
+
+    @classmethod
+    async def get_recent_user_payment(cls, user):
+        return sync_to_async(
+            cls.objects.filter(user=user).order_by("-created_at").first
+        )()
 
     class Meta:
         verbose_name = "User kursga tolovlari"

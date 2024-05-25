@@ -1,4 +1,5 @@
 import os
+from asgiref.sync import sync_to_async
 
 from aiogram import Router
 from aiogram import Bot
@@ -100,11 +101,11 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         await callback_query.message.answer(
             f"Please send a screenshot of your payment for the {plan_title} plan."
         )
+        # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
-        user.plan = plan_title  # Store the selected plan
-        await user.save()
-
-        # user_payment = UserPayment(user=user, plan)
+        payment, created = await UserPayment.get_payment_and_created(
+            user=user, plan_title=plan_title, screenshot=None
+        )
 
     elif callback_data.startswith("confirm_"):
         user_id = int(callback_data.split("_")[1])
@@ -157,28 +158,51 @@ async def receive_payment_check(message: Message):
         await message.answer("Please send a valid photo of your payment receipt.")
         return
 
+    user = await User.get_user(message)
+
+    user_payment = await UserPayment.get_recent_user_payment(user)
+    user_payment_instance = (
+        await user_payment
+    )  # Await the coroutine to get the actual instance
+
     photo_file_id = message.photo[-1].file_id
 
-    # Save the image details to the Django model
-    payment, created = await UserPayment.get_payment_and_created(
-        message=message,
-        plan_title=plan,
-        photo_file_id=photo_file_id
-    )
+    # Save the image details to the Django model asynchronously
+    # await sync_to_async(UserPayment.objects.update_or_create)(
+    #     user=user,
+    #     screenshot=photo_file_id
+    # )
+    
+    user_payment_instance.screenshot = photo_file_id
+    user_payment_instance.save()
 
-    caption = f"Payment check from user {message.from_user.full_name} (@{message.from_user.username}) for the {plan} plan."
+    
+
+    caption = f"Payment check from user {message.from_user.full_name} (@{message.from_user.username}) for the plan."
     try:
         await bot.send_photo(
-            chat_id=ADMIN_ID,
+            chat_id="7148758895",
             photo=photo_file_id,
             caption=caption,
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
-                    [InlineKeyboardButton(text="Confirm", callback_data=f"confirm_{user.user_id}")],
-                    [InlineKeyboardButton(text="Decline", callback_data=f"decline_{user.user_id}")]
+                    [
+                        InlineKeyboardButton(
+                            text="Confirm", callback_data=f"confirm_{user.user_id}"
+                        )
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            text="Decline", callback_data=f"decline_{user.user_id}"
+                        )
+                    ],
                 ]
-            )
+            ),
         )
-    except TelegramForbiddenError:
-        await message.answer("Failed to send payment check to the admin. Please contact support.")
-    await message.answer("Your payment check has been sent to the admin for confirmation.")
+    except Exception as e:
+        await message.answer(
+            "Failed to send payment check to the admin. Please contact support."
+        )
+    await message.answer(
+        "Your payment check has been sent to the admin for confirmation."
+    )
