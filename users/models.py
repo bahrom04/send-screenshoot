@@ -75,7 +75,7 @@ class Plan(BaseModel):
 
     def __str__(self) -> str:
         return self.title
-
+    
     class Meta:
         verbose_name = "Telegram Kurslar Tarifi"
 
@@ -84,7 +84,7 @@ class UserPayment(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments")
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name="payments")
 
-    screenshot = models.ImageField(upload_to="screenshots/")
+    screenshot = models.ImageField(upload_to="screenshots/", blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.user.user_id} ni {self.plan.title} ga to'lovi"

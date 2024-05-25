@@ -24,9 +24,9 @@ async def go_back() -> InlineKeyboardMarkup:
 async def cources() -> InlineKeyboardMarkup:
 
     buttons = [
-        [InlineKeyboardButton(text="Standart", callback_data="standart")],
-        [InlineKeyboardButton(text="Premium", callback_data="premium")],
-        [InlineKeyboardButton(text="Vip", callback_data="vip")],
+        [InlineKeyboardButton(text="Standart", callback_data="plan_Standart")],
+        [InlineKeyboardButton(text="Premium", callback_data="plan_Premium")],
+        [InlineKeyboardButton(text="Vip", callback_data="plan_Vip")],
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -45,5 +45,14 @@ async def payment_button() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
     return keyboard
+
+
+async def confirm_decline_buttons(user_id: int) -> InlineKeyboardMarkup:
+    buttons = [
+        InlineKeyboardButton(text="Confirm", callback_data=f"confirm_{user_id}"),
+        InlineKeyboardButton(text="Decline", callback_data=f"decline_{user_id}"),
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=[buttons])
+
 
 
