@@ -16,3 +16,23 @@ about_me_title = """Невозможно направлять кого-то на
 admin_contact = "https://t.me/kedi_uz"
 
 cources_info = """Quyidagi tariflarni tanlang"""
+
+def payment_info(plan: str, amount: str):
+
+    return f"""Siz {plan} tarifini tanladingiz 
+💰 NARX: {amount} soʻm
+
+💳 Toʻlov usullari Humo/Uzcard
+
+9860 0801 6403 2643
+
+MEXRUZ SHODIYEV nomida
+
+🔸 Eslatma! Toʻlov qilganingizdan soʻng, skrinshot joʻnatish tugmasini bosib toʻlov chekni menejerga joʻnatib qoʻying.
+
+❗️Muhim! Toʻlov chekini joʻnatmaslik sizni kursga qabul qilmaslikga asos boʻlishi mumkin!
+
+📕Kursga toʻlov qilish sizni, kurs qoidalari bilan tanishganizni tastiqlaydi!
+
+📬Sizda toʻlov bilan muammo yuzaga kelsa @menejer_ekspert ga yozing! 
+(Visa, Mastercard,Sberbank, elektron hamyon)"""

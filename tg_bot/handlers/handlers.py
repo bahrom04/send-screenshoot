@@ -7,12 +7,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, FSInputFile, ContentType
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tg_bot.keyboards.keyboards import (
-    main_menu,
-    go_back,
-    cources,
-    payment_button,
-)
+from tg_bot.keyboards.keyboards import main_menu, go_back, cources, payment_button
 
 from utils import static
 from users.models import User
@@ -54,7 +49,7 @@ async def receive_payment_check(message: Message):
     """
     caption = f"Payment check from user {message.from_user.full_name} (@{message.from_user.username})."
     await bot.send_photo(
-        chat_id=1107759940,
+        chat_id=7148758895,
         photo=message.photo[-1].file_id,
         caption=caption,
         reply_markup=await confirm_decline_buttons(message.from_user.id),
@@ -105,18 +100,30 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
     elif callback_data == "standart":
-        await callback_query.message.answer(
-            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        title = static.payment_info(plan="Standart", amount="399 000")
+        photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
+        await bot.send_photo(
+            chat_id=callback_query.from_user.id,
+            photo=photo,
+            caption=title,
         )
 
     elif callback_data == "premium":
-        await callback_query.message.answer(
-            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        title = static.payment_info(plan="Premium", amount="599 000")
+        photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
+        await bot.send_photo(
+            chat_id=callback_query.from_user.id,
+            photo=photo,
+            caption=title,
         )
 
     elif callback_data == "vip":
-        await callback_query.message.answer(
-            text="pulni tolaysizmi?", reply_markup=await payment_button()
+        title = static.payment_info(plan="Vip", amount="2 499 000")
+        photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
+        await bot.send_photo(
+            chat_id=callback_query.from_user.id,
+            photo=photo,
+            caption=title,
         )
 
     elif callback_data == "go_back":

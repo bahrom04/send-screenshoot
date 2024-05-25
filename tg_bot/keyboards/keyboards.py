@@ -41,7 +41,6 @@ async def payment_button() -> InlineKeyboardMarkup:
                 text="To'lov skrinshotini yuborish", callback_data="payment"
             )
         ],
-        [InlineKeyboardButton(text="Ortga", callback_data="cources")],
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
