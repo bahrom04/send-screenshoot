@@ -89,12 +89,14 @@ async def command_start_handler(message: Message) -> None:
     payment = await sync_to_async(list)(
         UserPayment.objects.filter(user=u[0]["user_id"]).values("is_verified")
     )
+    payment_status = payment[0]["is_verified"]
+    v = lambda payment_status: "Tasdiqlangan" if payment_status==True else "Tasdiqlanmagan"
 
     title = f"""
     ID: {u[0]["user_id"]}
     username: @{u[0]["username"]}
     
-    Tolvol: {payment}
+    Tolvol: {v}
     """
     await message.answer(text=title)
 
@@ -131,7 +133,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
         await callback_query.message.answer(
-            f"Please send a screenshot of your payment for the {plan_title} plan."
+            f"Iltimos {plan_title} uchun to'lov chekini jo'nating"
         )
         # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
@@ -148,7 +150,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
 
         await bot.send_message(
             chat_id="7148758895",
-            text="userga xabar jonatildi",
+            text="Foydalanuvchiga xabar jonatildi",
         )
 
         # Update user payment status
@@ -157,7 +159,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
         await bot.send_message(
-            chat_id=user_id, text="Your payment has been confirmed. Thank you!"
+            chat_id=user_id, text="To'lov uchun rahmat. To'lov admin tomonidan tasdiqlandi"
         )
 
     elif callback_data.startswith("decline_"):
@@ -165,11 +167,11 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         user = await User.get_user(callback_query.message)
 
         # Update user payment status
-        payment = await sync_to_async(UserPayment.objects.update)(
-            user=user, is_verified=False
+        await sync_to_async(UserPayment.objects.filter(user=user_id).update)(
+            is_verified=False
         )
         await bot.send_message(
-            chat_id=user_id, text="Your payment has been declined. Please try again."
+            chat_id=user_id, text="Tolovingiz admin tomonidan bekor qilindi"
         )
 
     if callback_data == "about_me":
@@ -206,7 +208,7 @@ async def receive_payment_check(message: Message):
     This handler receives payment check screenshots from the user
     """
     if not message.photo:
-        await message.answer("Please send a valid photo of your payment receipt.")
+        await message.answer("Iltimos to'lov ckekini yuboring")
         return
 
     user = await User.get_user(message)
@@ -221,7 +223,9 @@ async def receive_payment_check(message: Message):
         photo_file_id, "/Users/bahrom04/workplace/django/nadia-kurs/rasm/"
     )
 
-    caption = f"Payment check from user {message.from_user.full_name} (@{message.from_user.username}) for the plan."
+    caption = f'''{message.from_user.full_name} tomonidan to'lov cheki yuborildi
+    Username: (@{message.from_user.username})
+    userID: {message.chat.id}'''
     try:
         await bot.send_photo(
             chat_id="7148758895",
@@ -231,12 +235,12 @@ async def receive_payment_check(message: Message):
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="Confirm", callback_data=f"confirm_{user.user_id}"
+                            text="To'lovni tasdiqlash", callback_data=f"confirm_{user.user_id}"
                         )
                     ],
                     [
                         InlineKeyboardButton(
-                            text="Decline", callback_data=f"decline_{user.user_id}"
+                            text="To'lovni rad etish", callback_data=f"decline_{user.user_id}"
                         )
                     ],
                 ]
@@ -247,5 +251,5 @@ async def receive_payment_check(message: Message):
             "Failed to send payment check to the admin. Please contact support."
         )
     await message.answer(
-        "Your payment check has been sent to the admin for confirmation."
+        "To'lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting"
     )
