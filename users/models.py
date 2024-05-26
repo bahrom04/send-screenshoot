@@ -84,18 +84,18 @@ class Plan(BaseModel):
 
 class UserPayment(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments")
-    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name="payments")
-    screenshot = models.ImageField(upload_to="screenshots/", blank=True, null=True)
+    screenshot = models.CharField(max_length=255, blank=True, null=True)
+
+    is_verified = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.user.user_id}'s payment for {self.plan.title}"
+        return f"{self.user.user_id}'s payment for"
 
     @classmethod
-    async def get_payment_and_created(cls, user, plan_title, screenshot):
+    async def get_payment_and_created(cls, user, screenshot):
         """Get or create a User Payment instance."""
-        plan = await sync_to_async(Plan.objects.get)(title=plan_title)
         payment, created = await sync_to_async(cls.objects.update_or_create)(
-            user=user, plan=plan, screenshot=screenshot
+            user=user, screenshot=screenshot
         )
         return payment, created
 
