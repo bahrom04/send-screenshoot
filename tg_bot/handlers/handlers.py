@@ -42,10 +42,6 @@ async def download_telegram_file(file_id, destination):
     response = requests.get(file_url)
     response.raise_for_status()
 
-    # Ensure the destination directory exists
-    if not os.path.exists(destination):
-        os.makedirs(destination)
-
     # Construct the full file path
     file_name = os.path.join(destination, os.path.basename(file_path))
 
