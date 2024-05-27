@@ -4,8 +4,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 async def main_menu() -> InlineKeyboardMarkup:
     buttons = [
         [InlineKeyboardButton(text="Men haqimda", callback_data="about_me")],
-        [InlineKeyboardButton(text="Admin", callback_data="admin")],
         [InlineKeyboardButton(text="Kurslar", callback_data="cources")],
+        [InlineKeyboardButton(text="Admin", callback_data="admin")],
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 

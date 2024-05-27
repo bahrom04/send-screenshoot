@@ -58,19 +58,7 @@ async def download_telegram_file(file_id, destination):
 async def show_payment_details(callback_query: CallbackQuery, plan_title, plan_amount):
     title = static.payment_info(plan=plan_title, amount=plan_amount)
     # photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
-    await callback_query.message.answer(
-        text=title,
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="Kursga to'lov",
-                        callback_data=f"pay_{plan_title.lower()}_{callback_query.message.chat.id}",
-                    )
-                ]
-            ]
-        ),
-    )
+    await callback_query.message.answer(text=title)
 
 
 @start_router.message(Command("profil"))
@@ -86,7 +74,9 @@ async def command_start_handler(message: Message) -> None:
         UserPayment.objects.filter(user=u[0]["user_id"]).values("is_verified")
     )
     payment_status = payment[0]["is_verified"]
-    v = lambda payment_status: "Tasdiqlangan" if payment_status==True else "Tasdiqlanmagan"
+    v = lambda payment_status: (
+        "Tasdiqlangan" if payment_status == True else "Tasdiqlanmagan"
+    )
 
     title = f"""
     ID: {u[0]["user_id"]}
@@ -119,20 +109,35 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
         if plan_title == "Plus18":
-            await show_payment_details(callback_query, "18+", "1 300 000")
+            await callback_query.message.answer(
+                text=static.cources_info,
+                reply_markup=InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text="Kursga to'lov",
+                                callback_data=f"pay_{plan_title.lower()}",
+                            )
+                        ]
+                    ]
+                ),
+            )
+
         else:
             await callback_query.message.answer(
-            f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
-        )
+                f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
+            )
 
-        
-
-    elif callback_data.startswith("pay_"):
+    if callback_data.startswith("pay_"):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
-        await callback_query.message.answer(
-            f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
-        )
+
+        if plan_title == "Plus18":
+            await show_payment_details(callback_query, "18+", "1 300 000")
+            await callback_query.message.answer(
+                f"Iltimos 18+ kursi uchun to'lov chekini jo'nating"
+            )
+
         # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
         if await sync_to_async(UserPayment.objects.filter(user=user).exists)():
@@ -157,7 +162,8 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
         await bot.send_message(
-            chat_id=user_id, text="To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️"
+            chat_id=user_id,
+            text="To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️",
         )
 
     elif callback_data.startswith("decline_"):
@@ -173,9 +179,14 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
     if callback_data == "about_me":
-        await callback_query.message.edit_text(
-            text=static.about_me_title, reply_markup=await go_back()
+        photo = FSInputFile(path="utils/images/aboutme.jpg", filename="aboutme")
+        await bot.send_photo(
+            chat_id=callback_query.from_user.id,
+            caption=static.about_me_title,
+            photo=photo,
+            reply_markup=await go_back(),
         )
+        
 
     elif callback_data == "admin":
         await callback_query.message.edit_text(
@@ -188,7 +199,6 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             chat_id=callback_query.from_user.id,
             photo=photo,
             reply_markup=await cources(),
-            caption=static.cources_info,
         )
 
     elif callback_data == "go_back":
@@ -222,9 +232,9 @@ async def receive_payment_check(message: Message):
         photo_file_id, os.path.join(root_dir, "rasm/")
     )
 
-    caption = f'''{message.from_user.full_name} tomonidan to'lov cheki yuborildi
+    caption = f"""{message.from_user.full_name} tomonidan to'lov cheki yuborildi
 Username: (@{message.from_user.username})
-userID: {message.chat.id}'''
+userID: {message.chat.id}"""
     try:
         await bot.send_photo(
             chat_id=ADMIN,
@@ -234,12 +244,14 @@ userID: {message.chat.id}'''
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="To'lovni tasdiqlash", callback_data=f"confirm_{user.user_id}"
+                            text="To'lovni tasdiqlash",
+                            callback_data=f"confirm_{user.user_id}",
                         )
                     ],
                     [
                         InlineKeyboardButton(
-                            text="To'lovni rad etish", callback_data=f"decline_{user.user_id}"
+                            text="To'lovni rad etish",
+                            callback_data=f"decline_{user.user_id}",
                         )
                     ],
                 ]
