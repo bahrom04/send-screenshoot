@@ -1,38 +1,42 @@
-main_menu_title = f"""Здравствуйте ❤️  
-     
-    Добро пожаловать в мой официальный Telegram-bot. Здесь вы можете сделать оплату за мои курсы, вебинары, и семинары.                                        
-    Выберите нужный раздел для вас снизу ⬇️"""
+main_menu_title = f"""Assalomu alaykum😊
 
-about_me_title = """Невозможно направлять кого-то на правильный путь, если твой собственный был устлан только розами.
-Мой путь был непрост. Были разочарования, запреты проявляться, работать, лишний вес, болезни, когда жизнь висела на волоске, неуверенность в себе и куча вопросов. 
-Но! Работа над собой, установление причинно-следственных связей, отпускание обид и глубокая проработка своего Рода дают результаты по сей день. 
-Сегодня я, на основе своего опыта, помогаю тысячам девушек со всего мира кардинально поменять свою жизнь в лучшую сторону.
-Уже много лет я являюсь членом ассоциации психологов Узбекистана. С опытом в саморазвитии более 10 лет, а в качестве коуча и психолога помогаю девушкам уже более 5 лет.
-Свой первый поток авторского курса «Интенсив» запустила в 2019 году и все эти годы он помогает девушкам заложить крепкий фундамент для дальнейшего развития.
-В 2021 году начала работать над проектом «Я и мой Род». И уже в 2022, внутри данного проекта, успешно запустила курс «Терапия внутреннего ребенка», «Отношения с папой», «Отношения с мамой»  а участницы получили колоссальный результат и очень глубокую проработку.
-Помимо этого, разработала еще несколько программ и семинаров, которые помогут вам понять себя, свою ценность, исцелить травмы и наконец поменять кардинально мир вокруг себя, выйти на новый уровень в жизни, в отношениях и в деньгах.
-И Вы можете стать одной из них, ведь изменения уже здесь, на расстоянии одного клика!"""
+Mening rasmiy Telegram botimga xush kelibsiz! Bu yerda siz maxsus yopiq kurslar, vebinar va seminarlar uchun toʻlovni amalga oshirishingiz mumkin.
 
-admin_contact = "https://t.me/kedi_uz"
+Buning uchun oʻzingizga kerakli boʻlimni tanlang⬇️"""
 
-cources_info = """Quyidagi tariflarni tanlang"""
+about_me_title = """Men Nadia Abdullaxodjayeva Abdukadirovna, koʻp yillik tajribaga ega reproduktiv psixologman.
+
+Toshkent davlat pedagogika universitetida tahsil olganman. Psixologiya yoʻnalishi boʻyicha bakalavr va magistr darajasiga egaman. 
+
+Ushbu oliygoh qoshidagi Mutaxassislarni qayta tayyorlash maktabining psixologiya kursida doimiy malaka oshiraman. Onlayn amaliy psixologiya institutida 1,5 yil davomida amaliy psixologiya va seksologiya yoʻnalishlarida tahsil olganman.
+
+Hozirda Nadiaʼs School nomli reproduktiv psixologiya maktabiga asos solganman. 3000 soatdan ortiq terapevtik kurslar oʻtkazganman.
+
+“Bepushtlik bilan ogʻrigan ayollarning psixologik xususiyatlari”, “Jinsiy tarbiya” kitoblari va “Vaginizmning ilmiy asosi — bu birlamchi bepushtlikka olib keluvchi omil” maqolasi muallifiman."""
+
+
+cources_info = """Assalomu alaykum! 18+ yopiq kursiga qiziqish bildirganingiz uchun rahmat.
+
+Ushbu terapiya kursimizda koʻplab savollarga javob topasiz, hayotingizda uchraydigan jinsiy muammolarni yengish texnikalarini oʻrganasiz va albatta oʻzingizdagi qoʻrquvni yengasiz.
+
+Eng asosiysi, kurs toʻliq oʻzbek tilida boʻlib oʻtadi. Terapiya toʻliq yopiq shaklda va yakka tartibda oʻtkaziladi. Yaʼni sizning shaxsingiz sir saqlanadi va uchinchi tomonga hech qachon oshkor etilmaydi."""
 
 def payment_info(plan: str, amount: str):
 
-    return f"""Siz {plan} tarifini tanladingiz 
-💰 NARX: {amount} soʻm
+    return f"""{plan} kursiga xush kelibsiz!
+💰NARX: {amount} soʻm
 
-💳 Toʻlov usullari Humo/Uzcard
+💳Toʻlov usullari Humo/UzCard
 
-9860 0801 6403 2643
+9860170104319927
 
-MEXRUZ SHODIYEV nomida
+Abdullakhodja N nomida
 
-🔸 Eslatma! Toʻlov qilganingizdan soʻng, skrinshot joʻnatish tugmasini bosib toʻlov chekni menejerga joʻnatib qoʻying.
+🔸Zarur! Toʻlov qilganingizdan soʻng chekni skrinshot qilib, menejerga yuboring.
 
-❗️Muhim! Toʻlov chekini joʻnatmaslik sizni kursga qabul qilmaslikga asos boʻlishi mumkin!
+❗️Muhim! Toʻlov chekini joʻnatmaslik sizni kursga qabul qilmaslikka asos boʻlishi mumkin!
 
-📕Kursga toʻlov qilish sizni, kurs qoidalari bilan tanishganizni tastiqlaydi!
+📕Kursga toʻlov qilish kurs qoidalari bilan tanishganingizni tasdiqlaydi!
 
-📬Sizda toʻlov bilan muammo yuzaga kelsa @menejer_ekspert ga yozing! 
-(Visa, Mastercard,Sberbank, elektron hamyon)"""
+📬Sizda toʻlov bilan muammo yuzaga kelsa @nadia_admini ga yozing! 
+(Visa, Mastercard, Sberbank, elektron hamyon)"""

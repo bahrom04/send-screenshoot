@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 async def main_menu() -> InlineKeyboardMarkup:
     buttons = [
-        [InlineKeyboardButton(text="About me", callback_data="about_me")],
+        [InlineKeyboardButton(text="Men haqimda", callback_data="about_me")],
         [InlineKeyboardButton(text="Admin", callback_data="admin")],
         [InlineKeyboardButton(text="Kurslar", callback_data="cources")],
     ]
@@ -13,7 +13,7 @@ async def main_menu() -> InlineKeyboardMarkup:
 
 
 async def go_back() -> InlineKeyboardMarkup:
-    title = "Go back"
+    title = "Ortga"
 
     buttons = [[InlineKeyboardButton(text=title, callback_data="go_back")]]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -24,9 +24,7 @@ async def go_back() -> InlineKeyboardMarkup:
 async def cources() -> InlineKeyboardMarkup:
 
     buttons = [
-        [InlineKeyboardButton(text="Standart", callback_data="plan_Standart")],
-        [InlineKeyboardButton(text="Premium", callback_data="plan_Premium")],
-        [InlineKeyboardButton(text="Vip", callback_data="plan_Vip")],
+        [InlineKeyboardButton(text="«18+» kurs", callback_data="plan_Plus18")],
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 

@@ -29,6 +29,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
+ADMIN = os.getenv("ADMIN")
+ADMIN_USER_NAME = os.getenv("ADMIN_USER_NAME")
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
 start_router = Router()
@@ -55,16 +57,14 @@ async def download_telegram_file(file_id, destination):
 # Helper function to show payment details
 async def show_payment_details(callback_query: CallbackQuery, plan_title, plan_amount):
     title = static.payment_info(plan=plan_title, amount=plan_amount)
-    photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
-    await bot.send_photo(
-        chat_id=callback_query.message.chat.id,
-        photo=photo,
-        caption=title,
+    # photo = FSInputFile(path="utils/images/carta.jpg", filename="carta")
+    await callback_query.message.answer(
+        text=title,
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text="Pay",
+                        text="Kursga to'lov",
                         callback_data=f"pay_{plan_title.lower()}_{callback_query.message.chat.id}",
                     )
                 ]
@@ -118,18 +118,20 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
     if callback_data.startswith("plan_"):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
-        if plan_title == "Standart":
-            await show_payment_details(callback_query, "Standart", "399 000")
-        elif plan_title == "Premium":
-            await show_payment_details(callback_query, "Premium", "599 000")
-        elif plan_title == "Vip":
-            await show_payment_details(callback_query, "VIP", "2 499 000")
+        if plan_title == "Plus18":
+            await show_payment_details(callback_query, "18+", "1 300 000")
+        else:
+            await callback_query.message.answer(
+            f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
+        )
+
+        
 
     elif callback_data.startswith("pay_"):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
         await callback_query.message.answer(
-            f"Iltimos {plan_title} uchun to'lov chekini jo'nating"
+            f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
         )
         # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
@@ -145,7 +147,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         # user = await User.get_user(callback_query.message)
 
         await bot.send_message(
-            chat_id="7148758895",
+            chat_id=ADMIN,
             text="Foydalanuvchiga xabar jonatildi",
         )
 
@@ -155,7 +157,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
         await bot.send_message(
-            chat_id=user_id, text="To'lov uchun rahmat. To'lov admin tomonidan tasdiqlandi"
+            chat_id=user_id, text="To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️"
         )
 
     elif callback_data.startswith("decline_"):
@@ -177,11 +179,11 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
 
     elif callback_data == "admin":
         await callback_query.message.edit_text(
-            text=static.admin_contact, reply_markup=await go_back()
+            text=ADMIN_USER_NAME, reply_markup=await go_back()
         )
 
     elif callback_data == "cources":
-        photo = FSInputFile(path="utils/images/tariflar-test.jpeg", filename="tariflar")
+        photo = FSInputFile(path="utils/images/kurslarim.png", filename="tariflar")
         await bot.send_photo(
             chat_id=callback_query.from_user.id,
             photo=photo,
@@ -214,17 +216,18 @@ async def receive_payment_check(message: Message):
     payment = await sync_to_async(UserPayment.objects.filter(user=user).update)(
         user=user, screenshot=photo_file_id
     )
-
+    # universal path
+    root_dir = os.getcwd()
     photo_path = await download_telegram_file(
-        photo_file_id, "/Users/bahrom04/workplace/django/nadia-kurs/rasm/"
+        photo_file_id, os.path.join(root_dir, "rasm/")
     )
 
     caption = f'''{message.from_user.full_name} tomonidan to'lov cheki yuborildi
-    Username: (@{message.from_user.username})
-    userID: {message.chat.id}'''
+Username: (@{message.from_user.username})
+userID: {message.chat.id}'''
     try:
         await bot.send_photo(
-            chat_id="7148758895",
+            chat_id=ADMIN,
             photo=photo_file_id,
             caption=caption,
             reply_markup=InlineKeyboardMarkup(
@@ -247,5 +250,5 @@ async def receive_payment_check(message: Message):
             "Failed to send payment check to the admin. Please contact support."
         )
     await message.answer(
-        "To'lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting"
+        "To‘lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting🙏🏼"
     )
