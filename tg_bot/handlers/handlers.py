@@ -7,10 +7,9 @@ from aiogram import Router
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery, FSInputFile, ContentType
+from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from django.conf import settings
 
 from tg_bot.keyboards.keyboards import (
     main_menu,
@@ -20,9 +19,9 @@ from tg_bot.keyboards.keyboards import (
     confirm_decline_buttons,
 )
 
-from utils import static
-from users.models import User, UserPayment
+from users.models import User, UserPayment, Plan
 
+from utils import static
 from dotenv import load_dotenv
 
 
@@ -105,22 +104,19 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
     """
     callback_data = callback_query.data
 
+    # Plans
     if callback_data.startswith("plan_"):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
         if plan_title == "Plus18":
             await callback_query.message.answer(
                 text=static.cources_info,
-                reply_markup=InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="Kursga to'lov",
-                                callback_data=f"pay_{plan_title.lower()}",
-                            )
-                        ]
-                    ]
-                ),
+                reply_markup=await payment_button(plan_title=plan_title),
+            )
+        if plan_title == "Professionalkurs":
+            await callback_query.message.answer(
+                text=static.cources_info,
+                reply_markup=await payment_button(plan_title=plan_title),
             )
 
         else:
@@ -128,6 +124,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
                 f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
             )
 
+    # Payment
     if callback_data.startswith("pay_"):
         plan_name = callback_data.split("_")[1]
         plan_title = plan_name.capitalize()
@@ -137,9 +134,20 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             await callback_query.message.answer(
                 f"Iltimos 18+ kursi uchun to'lov chekini jo'nating"
             )
+        if plan_title == "Professionalkurs":
+            await show_payment_details(callback_query, "Pro Kurs", "2 300 000")
+            await callback_query.message.answer(
+                f"Iltimos Pro Kurs kursi uchun to'lov chekini jo'nating"
+            )
 
         # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
+        plan = await sync_to_async(Plan.objects.get)(title=plan_title)
+
+        await sync_to_async(
+            User.objects.filter(user_id=callback_query.message.chat.id).update
+        )(current_plan=plan)
+
         if await sync_to_async(UserPayment.objects.filter(user=user).exists)():
             pass
         else:
@@ -186,7 +194,6 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             photo=photo,
             reply_markup=await go_back(),
         )
-        
 
     elif callback_data == "admin":
         await callback_query.message.edit_text(
@@ -219,12 +226,16 @@ async def receive_payment_check(message: Message):
         await message.answer("Iltimos to'lov ckekini yuboring")
         return
 
-    user = await User.get_user(message)
+    user = message.chat.id
+    # Get the user's current plan
+    current_plan = await sync_to_async(
+        User.objects.filter(user_id=user).values_list("current_plan", flat=True).first
+    )()
 
     photo_file_id = message.photo[-1].file_id
 
     payment = await sync_to_async(UserPayment.objects.filter(user=user).update)(
-        user=user, screenshot=photo_file_id
+        user=user, plan=current_plan, screenshot=photo_file_id
     )
     # universal path
     root_dir = os.getcwd()
@@ -258,9 +269,7 @@ userID: {message.chat.id}"""
             ),
         )
     except Exception as e:
-        await message.answer(
-            "Failed to send payment check to the admin. Please contact support."
-        )
+        await message.answer("error")
     await message.answer(
         "To‘lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting🙏🏼"
     )

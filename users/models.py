@@ -13,6 +13,18 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Plan(BaseModel):
+    title = models.CharField(
+        max_length=255, verbose_name="Kurs nomi", blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        verbose_name = "Telegram Kurslar Tarifi"
+
+
 class User(BaseModel):
     user_id = models.PositiveBigIntegerField(primary_key=True)
     username = models.CharField(max_length=32, null=True, blank=True)
@@ -24,6 +36,9 @@ class User(BaseModel):
     deep_link = models.CharField(max_length=64, null=True, blank=True)
     is_blocked_bot = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    current_plan = models.ForeignKey(
+        Plan, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def __str__(self):
         return f"@{self.username}" if self.username else f"{self.user_id}"
@@ -70,20 +85,10 @@ class User(BaseModel):
         return f"{self.first_name} {self.last_name}".strip()
 
 
-class Plan(BaseModel):
-    title = models.CharField(
-        max_length=255, verbose_name="Kurs nomi", blank=True, null=True
-    )
-
-    def __str__(self) -> str:
-        return self.title
-
-    class Meta:
-        verbose_name = "Telegram Kurslar Tarifi"
-
-
 class UserPayment(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments")
+    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True, blank=True)
+
     screenshot = models.CharField(max_length=255, blank=True, null=True)
 
     is_verified = models.BooleanField(default=False)
@@ -92,10 +97,10 @@ class UserPayment(BaseModel):
         return f"{self.user.user_id}'s payment for"
 
     @classmethod
-    async def get_payment_and_created(cls, user, screenshot):
+    async def get_payment_and_created(cls, user, screenshot, plan=None):
         """Get or create a User Payment instance."""
         payment, created = await sync_to_async(cls.objects.update_or_create)(
-            user=user, screenshot=screenshot
+            user=user, screenshot=screenshot, plan=plan
         )
         return payment, created
 
