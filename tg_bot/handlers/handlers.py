@@ -226,10 +226,10 @@ async def receive_payment_check(message: Message):
         await message.answer("Iltimos to'lov ckekini yuboring")
         return
 
-    user = message.chat.id
+    user = await User.get_user(message)
     # Get the user's current plan
     current_plan = await sync_to_async(
-        User.objects.filter(user_id=user).values_list("current_plan", flat=True).first
+        User.objects.filter(user_id=message.chat.id).values_list("current_plan", flat=True).first
     )()
 
     photo_file_id = message.photo[-1].file_id
