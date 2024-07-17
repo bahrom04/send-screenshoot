@@ -187,7 +187,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
     if callback_data == "about_me":
-        photo = FSInputFile(path="utils/images/aboutme.jpg", filename="aboutme")
+        photo = FSInputFile(path="utils/images/uravo.jpg", filename="aboutme")
         await bot.send_photo(
             chat_id=callback_query.from_user.id,
             caption=static.about_me_title,
