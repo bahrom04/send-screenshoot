@@ -16,7 +16,6 @@ from tg_bot.keyboards.keyboards import (
     go_back,
     cources,
     payment_button,
-    confirm_decline_buttons,
 )
 
 from users.models import User, UserPayment, Plan
@@ -106,39 +105,31 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
 
     # Plans
     if callback_data.startswith("plan_"):
-        plan_name = callback_data.split("_")[1]
-        plan_title = plan_name.capitalize()
-        if plan_title == "Plus18":
-            await callback_query.message.answer(
-                text=static.cources_info,
-                reply_markup=await payment_button(plan_title=plan_title),
-            )
-        if plan_title == "Professionalkurs":
-            await callback_query.message.answer(
-                text=static.cources_info,
-                reply_markup=await payment_button(plan_title=plan_title),
-            )
+        plan_title = callback_data.replace("plan_", "", 1)
+        # The '1' means only replace the first occurrence
 
-        else:
-            await callback_query.message.answer(
-                f"Iltimos {plan_title} kursi uchun to'lov chekini jo'nating"
-            )
+        model_plan_title = callback_data.replace("plan_", "", 1).replace(
+            "_", " "
+        )  
+        model_plan = await get_plan_amount(model_plan_title)
+
+        await callback_query.message.answer(
+            text=model_plan.description,
+            reply_markup=await payment_button(plan_title=plan_title),
+        )
 
     # Payment
     if callback_data.startswith("pay_"):
-        plan_name = callback_data.split("_")[1]
-        plan_title = plan_name.capitalize()
+        plan_title = callback_data.replace("pay_", "", 1).replace(
+            "_", " "
+        )  # The '1' means only replace the first occurrence
 
-        if plan_title == "Plus18":
-            await show_payment_details(callback_query, "18+", "1 300 000")
-            await callback_query.message.answer(
-                f"Iltimos 18+ kursi uchun to'lov chekini jo'nating"
-            )
-        if plan_title == "Professionalkurs":
-            await show_payment_details(callback_query, "Pro Kurs", "2 300 000")
-            await callback_query.message.answer(
-                f"Iltimos Pro Kurs kursi uchun to'lov chekini jo'nating"
-            )
+        plan_amount = await get_plan_amount(plan_title)
+        
+        await show_payment_details(callback_query, plan_title, plan_amount.amount)
+        await callback_query.message.answer(
+            f"Please send screenshot of {plan_title} course payment check"
+        )
 
         # Store the selected plan in the user's session
         user = await User.get_user(callback_query.message)
@@ -161,7 +152,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
 
         await bot.send_message(
             chat_id=ADMIN,
-            text="Foydalanuvchiga xabar jonatildi",
+            text="The confirmation message was sended to user",
         )
 
         # Update user payment status
@@ -169,13 +160,6 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             is_verified=True
         )
 
-        # Retrieve the most recent payment and related plan in one query
-        # payment_instance = await sync_to_async(
-        #     list(UserPayment.objects.select_related('plan')
-        #     .filter(user=user_id)
-        #     .order_by("-created_at")
-        #     .first()
-        # ))()
         payment_instance = await get_plan_model(user_id)
 
         if payment_instance and payment_instance.plan:
@@ -183,12 +167,12 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             telegram_link = payment_instance.plan.telegram_link
             await bot.send_message(
                 chat_id=user_id,
-                text=f"To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️ {telegram_link}",
+                text=f"Payment was succesfull. Join to private group for further details {telegram_link}",
             )
         else:
             await bot.send_message(
                 chat_id=user_id,
-                text="To‘lov ma'lumotlari topilmadi yoki reja mavjud emas.",
+                text="Payment information not found",
             )
 
     elif callback_data.startswith("decline_"):
@@ -200,7 +184,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             is_verified=False
         )
         await bot.send_message(
-            chat_id=user_id, text="Tolovingiz admin tomonidan bekor qilindi"
+            chat_id=user_id, text="The payment was declined by admin"
         )
 
     if callback_data == "about_me":
@@ -218,7 +202,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )
 
     elif callback_data == "cources":
-        photo = FSInputFile(path="utils/images/kurslarim.png", filename="tariflar")
+        photo = FSInputFile(path="utils/images/kurslar.png", filename="tariflar")
         await bot.send_photo(
             chat_id=callback_query.from_user.id,
             photo=photo,
@@ -240,7 +224,7 @@ async def receive_payment_check(message: Message):
     This handler receives payment check screenshots from the user
     """
     if not message.photo:
-        await message.answer("Iltimos to'lov ckekini yuboring")
+        await message.answer("Please send check of your payment for the lecture")
         return
 
     user = await User.get_user(message)
@@ -262,7 +246,7 @@ async def receive_payment_check(message: Message):
         photo_file_id, os.path.join(root_dir, "rasm/")
     )
 
-    caption = f"""{message.from_user.full_name} tomonidan to'lov cheki yuborildi
+    caption = f"""{message.from_user.full_name} The check sended by this user to admin
 Username: (@{message.from_user.username})
 userID: {message.chat.id}"""
     try:
@@ -274,13 +258,13 @@ userID: {message.chat.id}"""
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="To'lovni tasdiqlash",
+                            text="Confirm payment",
                             callback_data=f"confirm_{user.user_id}",
                         )
                     ],
                     [
                         InlineKeyboardButton(
-                            text="To'lovni rad etish",
+                            text="Decline payment",
                             callback_data=f"decline_{user.user_id}",
                         )
                     ],
@@ -290,15 +274,23 @@ userID: {message.chat.id}"""
     except Exception as e:
         await message.answer("error")
     await message.answer(
-        "To‘lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting🙏🏼"
+        "The check sended to the admin. Please wait until it's confirmation🙏🏼"
     )
 
 
+# Django queries
 @sync_to_async
-def get_plan_model(user_id):
+def get_plan_model(user_id: int):
     return (
         UserPayment.objects.select_related("plan")
         .filter(user=user_id)
         .order_by("-created_at")
         .first()
     )
+
+@sync_to_async
+def get_plan_amount(plan_title: str):
+    return (
+        Plan.objects.get(title=plan_title)    
+    )
+    

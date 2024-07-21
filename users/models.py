@@ -17,13 +17,16 @@ class Plan(BaseModel):
     title = models.CharField(
         max_length=255, verbose_name="Kurs nomi", blank=True, null=True
     )
+    description = models.TextField()
+    amount = models.BigIntegerField()
     telegram_link = models.CharField(max_length=255, blank=True, null=True)
+
 
     def __str__(self) -> str:
         return self.title
 
     class Meta:
-        verbose_name = "Telegram Kurslar Tarifi"
+        verbose_name = "Lectures"
 
 
 class User(BaseModel):
@@ -112,4 +115,4 @@ class UserPayment(BaseModel):
         )()
 
     class Meta:
-        verbose_name = "User kursga tolovlari"
+        verbose_name = "User Payments"

@@ -1,10 +1,20 @@
+from asgiref.sync import sync_to_async
+
+from users.models import Plan
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+
+# Keyboard button queries from django model
+@sync_to_async
+def get_plan_title():
+    return list(Plan.objects.all().values_list("title", flat=True).order_by("-created_at"))
 
 
 async def main_menu() -> InlineKeyboardMarkup:
     buttons = [
-        [InlineKeyboardButton(text="Men haqimda", callback_data="about_me")],
-        [InlineKeyboardButton(text="Kurslar", callback_data="cources")],
+        [InlineKeyboardButton(text="About us", callback_data="about_me")],
+        [InlineKeyboardButton(text="Courses/Lectures", callback_data="cources")],
         [InlineKeyboardButton(text="Admin", callback_data="admin")],
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -22,11 +32,14 @@ async def go_back() -> InlineKeyboardMarkup:
 
 
 async def cources() -> InlineKeyboardMarkup:
+    titles = await get_plan_title()
+    
+    buttons = []
 
-    buttons = [
-        [InlineKeyboardButton(text="«18+» kurs", callback_data="plan_Plus18")],
-        [InlineKeyboardButton(text="Professional kurs", callback_data="plan_Professionalkurs")],
-    ]
+    for title in titles:
+        callback_title = title.replace(" ", "_")
+        buttons.append([InlineKeyboardButton(text=title, callback_data=f"plan_{callback_title}")])
+
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
     return keyboard
@@ -37,7 +50,7 @@ async def payment_button(plan_title: str) -> InlineKeyboardMarkup:
     buttons = [
         [
             InlineKeyboardButton(
-                text="Kursga to'lov", callback_data=f"pay_{plan_title.lower()}"
+                text="Pay", callback_data=f"pay_{plan_title}"
             )
         ]
     ]

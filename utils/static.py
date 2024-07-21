@@ -23,20 +23,20 @@ Eng asosiysi, kurs toʻliq oʻzbek tilida boʻlib oʻtadi. Terapiya toʻliq yopi
 
 def payment_info(plan: str, amount: str):
 
-    return f"""{plan} kursiga xush kelibsiz!
-💰NARX: {amount} soʻm
+    return f"""Welcome to the {plan}!
+💰 PRICE: {amount} soums
 
-💳Toʻlov usullari Humo/UzCard
+💳Payment methods Humo/UzCard
 
 9860170104319927
 
-Abdullakhodja N nomida
+In the name of Abdullakhodja N
 
-🔸Zarur! Toʻlov qilganingizdan soʻng chekni skrinshot qilib, menejerga yuboring.
+🔸 Necessary! After you pay, take a screenshot of the receipt and send it to the manager.
 
-❗️Muhim! Toʻlov chekini joʻnatmaslik sizni kursga qabul qilmaslikka asos boʻlishi mumkin!
+❗️Important! Failure to send a payment check may result in you not being admitted to the course!
 
-📕Kursga toʻlov qilish kurs qoidalari bilan tanishganingizni tasdiqlaydi!
+📕Paying for the course confirms that you are familiar with the rules of the course!
 
-📬Sizda toʻlov bilan muammo yuzaga kelsa @nadia_admini ga yozing! 
-(Visa, Mastercard, Sberbank, elektron hamyon)"""
+📬 If you have a problem with payment, write to @nadia_admini!
+(Visa, Mastercard, Sberbank, electronic wallet)"""
