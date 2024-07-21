@@ -17,6 +17,7 @@ class Plan(BaseModel):
     title = models.CharField(
         max_length=255, verbose_name="Kurs nomi", blank=True, null=True
     )
+    telegram_link = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.title

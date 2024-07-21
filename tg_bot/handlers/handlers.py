@@ -169,10 +169,27 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
             is_verified=True
         )
 
-        await bot.send_message(
-            chat_id=user_id,
-            text="To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️",
-        )
+        # Retrieve the most recent payment and related plan in one query
+        # payment_instance = await sync_to_async(
+        #     list(UserPayment.objects.select_related('plan')
+        #     .filter(user=user_id)
+        #     .order_by("-created_at")
+        #     .first()
+        # ))()
+        payment_instance = await get_plan_model(user_id)
+
+        if payment_instance and payment_instance.plan:
+            # Access the `telegram_link` field from the related `Plan` model
+            telegram_link = payment_instance.plan.telegram_link
+            await bot.send_message(
+                chat_id=user_id,
+                text=f"To‘lov uchun rahmat. To‘lov admin tomonidan tasdiqlandi☺️ {telegram_link}",
+            )
+        else:
+            await bot.send_message(
+                chat_id=user_id,
+                text="To‘lov ma'lumotlari topilmadi yoki reja mavjud emas.",
+            )
 
     elif callback_data.startswith("decline_"):
         user_id = int(callback_data.split("_")[1])
@@ -229,7 +246,9 @@ async def receive_payment_check(message: Message):
     user = await User.get_user(message)
     # Get the user's current plan
     current_plan = await sync_to_async(
-        User.objects.filter(user_id=message.chat.id).values_list("current_plan", flat=True).first
+        User.objects.filter(user_id=message.chat.id)
+        .values_list("current_plan", flat=True)
+        .first
     )()
 
     photo_file_id = message.photo[-1].file_id
@@ -272,4 +291,14 @@ userID: {message.chat.id}"""
         await message.answer("error")
     await message.answer(
         "To‘lovni tasdiqlash uchun adminga yuborildi. Javob kelishini kuting🙏🏼"
+    )
+
+
+@sync_to_async
+def get_plan_model(user_id):
+    return (
+        UserPayment.objects.select_related("plan")
+        .filter(user=user_id)
+        .order_by("-created_at")
+        .first()
     )
