@@ -1,25 +1,13 @@
-main_menu_title = f"""Assalomu alaykum😊
+main_menu_title = f"""Hello😊
 
-Mening rasmiy Telegram botimga xush kelibsiz! Bu yerda siz maxsus yopiq kurslar, vebinar va seminarlar uchun toʻlovni amalga oshirishingiz mumkin.
+Welcome to official @uravo telegram bot!. Here you can pay for lectures and you can contact to the admin.
 
-Buning uchun oʻzingizga kerakli boʻlimni tanlang⬇️"""
+Please choose options below⬇️"""
 
-about_me_title = """Men Nadia Abdullaxodjayeva Abdukadirovna, koʻp yillik tajribaga ega reproduktiv psixologman.
+about_me_title = """Uravo Group offers offshore development services, leveraging Uzbek engineers' expertise. Our "Lab style development" system allows flexible engineer assignments to multiple projects. We ensure cost-efficiency below industry standards without compromising quality.
 
-Toshkent davlat pedagogika universitetida tahsil olganman. Psixologiya yoʻnalishi boʻyicha bakalavr va magistr darajasiga egaman. 
-
-Ushbu oliygoh qoshidagi Mutaxassislarni qayta tayyorlash maktabining psixologiya kursida doimiy malaka oshiraman. Onlayn amaliy psixologiya institutida 1,5 yil davomida amaliy psixologiya va seksologiya yoʻnalishlarida tahsil olganman.
-
-Hozirda Nadiaʼs School nomli reproduktiv psixologiya maktabiga asos solganman. 3000 soatdan ortiq terapevtik kurslar oʻtkazganman.
-
-“Bepushtlik bilan ogʻrigan ayollarning psixologik xususiyatlari”, “Jinsiy tarbiya” kitoblari va “Vaginizmning ilmiy asosi — bu birlamchi bepushtlikka olib keluvchi omil” maqolasi muallifiman."""
-
-
-cources_info = """Assalomu alaykum! 18+ yopiq kursiga qiziqish bildirganingiz uchun rahmat.
-
-Ushbu terapiya kursimizda koʻplab savollarga javob topasiz, hayotingizda uchraydigan jinsiy muammolarni yengish texnikalarini oʻrganasiz va albatta oʻzingizdagi qoʻrquvni yengasiz.
-
-Eng asosiysi, kurs toʻliq oʻzbek tilida boʻlib oʻtadi. Terapiya toʻliq yopiq shaklda va yakka tartibda oʻtkaziladi. Yaʼni sizning shaxsingiz sir saqlanadi va uchinchi tomonga hech qachon oshkor etilmaydi."""
+Combining Japanese design finesse with Uzbek proficiency, we deliver robust solutions. Our international reach underscores our commitment to quality in Japan and beyond.
+"""
 
 def payment_info(plan: str, amount: str):
 
@@ -28,9 +16,9 @@ def payment_info(plan: str, amount: str):
 
 💳Payment methods Humo/UzCard
 
-9860170104319927
+5614 6887 1076 9935
 
-In the name of Abdullakhodja N
+In the name of DAISUKE KATO
 
 🔸 Necessary! After you pay, take a screenshot of the receipt and send it to the manager.
 
@@ -38,5 +26,5 @@ In the name of Abdullakhodja N
 
 📕Paying for the course confirms that you are familiar with the rules of the course!
 
-📬 If you have a problem with payment, write to @nadia_admini!
+📬 If you have a problem with payment, write to @bahrombek19!
 (Visa, Mastercard, Sberbank, electronic wallet)"""
