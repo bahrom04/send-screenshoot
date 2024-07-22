@@ -23,7 +23,7 @@ async def main_menu() -> InlineKeyboardMarkup:
 
 
 async def go_back() -> InlineKeyboardMarkup:
-    title = "Ortga"
+    title = "Go back"
 
     buttons = [[InlineKeyboardButton(text=title, callback_data="go_back")]]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)

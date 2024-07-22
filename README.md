@@ -5,5 +5,5 @@ https://stackoverflow.com/questions/61926359/django-synchronousonlyoperation-you
 
 ## gunicorn
 ```
-sudo nano /etc/systemd/system/gunicorn.service
+sudo nano /etc/systemd/system/gunicorn-secondapp.service
 ```
