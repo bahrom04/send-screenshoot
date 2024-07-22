@@ -7,3 +7,9 @@ https://stackoverflow.com/questions/61926359/django-synchronousonlyoperation-you
 ```
 sudo nano /etc/systemd/system/gunicorn-secondapp.service
 ```
+
+## Modify bot.py: Make your changes to the Python script.
+## Restart the service: Restart the service to apply the changes to the script.
+```
+sudo systemctl restart uravo-bot.service
+```
