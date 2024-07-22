@@ -125,3 +125,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost"
 ]
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
