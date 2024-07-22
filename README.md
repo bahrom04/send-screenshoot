@@ -2,3 +2,8 @@
 ```
 https://stackoverflow.com/questions/61926359/django-synchronousonlyoperation-you-cannot-call-this-from-an-async-context-u
 ```
+
+## gunicorn
+```
+sudo nano /etc/systemd/system/gunicorn.service
+```
