@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import mark_safe
 from aiogram.types import Message, CallbackQuery
 from asgiref.sync import sync_to_async
 
@@ -94,12 +95,18 @@ class UserPayment(BaseModel):
     plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True, blank=True)
 
     screenshot = models.CharField(max_length=255, blank=True, null=True)
+    screenshoot = models.ImageField(upload_to="", blank=True, null=True)
 
     is_verified = models.BooleanField(default=False)
 
-    def __str__(self) -> str:
-        return f"{self.user.user_id}'s payment for"
+    def image_tag(self):
+        if self.screenshoot:
+            return mark_safe(f'<img src="{self.screenshoot.url}" width="70" height="70" />')
+        return "No Image"
 
+    image_tag.short_description = 'Image Preview'
+
+    
     @classmethod
     async def get_payment_and_created(cls, user, screenshot, plan=None):
         """Get or create a User Payment instance."""

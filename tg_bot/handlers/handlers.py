@@ -1,6 +1,9 @@
 import os
 import requests
 
+from django.conf import settings
+from django.core.files import File
+
 from asgiref.sync import sync_to_async
 
 from aiogram import Router
@@ -34,7 +37,7 @@ bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 start_router = Router()
 
 
-async def download_telegram_file(file_id, destination):
+async def download_telegram_file(file_id: str, user: str, current_plan: str):
     file_info = await bot.get_file(file_id)
     file_path = file_info.file_path
     file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
@@ -43,11 +46,19 @@ async def download_telegram_file(file_id, destination):
     response.raise_for_status()
 
     # Construct the full file path
-    file_name = os.path.join(destination, os.path.basename(file_path))
+    file_name = os.path.join(settings.MEDIA_ROOT, os.path.basename(file_path))
 
     # Save the file
     with open(file_name, "wb") as f:
         f.write(response.content)
+
+
+    relative_file_name = os.path.join('', os.path.basename(file_path))  # Relative path to save in ImageField
+
+    await sync_to_async(UserPayment.objects.filter(user=user).update)(
+        user=user, plan=current_plan, screenshoot=relative_file_name
+    )
+        
 
     return file_name
 
@@ -108,9 +119,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         plan_title = callback_data.replace("plan_", "", 1)
         # The '1' means only replace the first occurrence
 
-        model_plan_title = callback_data.replace("plan_", "", 1).replace(
-            "_", " "
-        )  
+        model_plan_title = callback_data.replace("plan_", "", 1).replace("_", " ")
         model_plan = await get_plan_amount(model_plan_title)
 
         await callback_query.message.answer(
@@ -125,7 +134,7 @@ async def main_callback_query(callback_query: CallbackQuery, bot: Bot):
         )  # The '1' means only replace the first occurrence
 
         plan_amount = await get_plan_amount(plan_title)
-        
+
         await show_payment_details(callback_query, plan_title, plan_amount.amount)
         await callback_query.message.answer(
             f"Please send screenshot of {plan_title} course payment check"
@@ -242,9 +251,7 @@ async def receive_payment_check(message: Message):
     )
     # universal path
     root_dir = os.getcwd()
-    photo_path = await download_telegram_file(
-        photo_file_id, os.path.join(root_dir, "rasm/")
-    )
+    photo_path = await download_telegram_file(photo_file_id, user, current_plan)
 
     caption = f"""{message.from_user.full_name} The check sended by this user to admin
 Username: (@{message.from_user.username})
@@ -288,9 +295,7 @@ def get_plan_model(user_id: int):
         .first()
     )
 
+
 @sync_to_async
 def get_plan_amount(plan_title: str):
-    return (
-        Plan.objects.get(title=plan_title)    
-    )
-    
+    return Plan.objects.get(title=plan_title)

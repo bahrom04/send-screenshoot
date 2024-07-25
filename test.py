@@ -6,5 +6,6 @@ sliced_title = title.replace("plan_", "", 1)  # The '1' means only replace the f
 print(sliced_title)
 
 
-
+file_name = os.path.join("rasm/", os.path.basename("photo/file.jpg"))
+print(file_name)
 
