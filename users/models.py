@@ -16,7 +16,7 @@ class BaseModel(models.Model):
 
 class Plan(BaseModel):
     title = models.CharField(
-        max_length=255, verbose_name="Kurs nomi", blank=True, null=True
+        max_length=255, verbose_name="Course name", blank=True, null=True
     )
     description = models.TextField()
     amount = models.BigIntegerField()
