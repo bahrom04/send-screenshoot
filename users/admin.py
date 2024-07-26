@@ -3,18 +3,36 @@ from users import models
 
 from django.urls import path
 from django.shortcuts import redirect
-from django.utils.html import format_html
+
+from import_export.admin import ExportActionModelAdmin
+from import_export import resources
+from import_export.formats.base_formats import XLS, XLSX, JSON
 
 
-class UserAdmin(admin.ModelAdmin):
+class UserResource(resources.ModelResource):
+    class Meta:
+        model = models.User
+        fields = ("user_id", "username", "current_plan__title", "updated_at")
+
+@admin.register(models.User)
+class UserAdmin(ExportActionModelAdmin):
+    resource_class = UserResource
     list_display = ["user_id", "username", "current_plan", "updated_at"]
     list_filter = ["current_plan"]
     search_fields = ['user_id', "username", "first_name"]
+    list_per_page = 20
 
 
+class PlanResouces(resources.ModelResource):
+    class Meta:
+        model = models.Plan
+        fields = ("title", "amount", "telegram_link", "updated_at")
 
-class UserPlanAdmin(admin.ModelAdmin):
+@admin.register(models.Plan)
+class UserPlanAdmin(ExportActionModelAdmin):
+    resource_class = PlanResouces
     list_display = ["title", "amount", "telegram_link"]
+    list_per_page = 20
     
     change_form_template = "admin/change_form.html"
 
@@ -36,12 +54,15 @@ class UserPlanAdmin(admin.ModelAdmin):
         return redirect('../../')
 
 
+class UserPaymentResource(resources.ModelResource):
+    class Meta:
+        model = models.UserPayment
+        fields = ("user", "plan__title", "screenshoot", "is_verified", "updated_at")
 
-class UserPaymentAdmin(admin.ModelAdmin):
+@admin.register(models.UserPayment)
+class UserPaymentAdmin(ExportActionModelAdmin):
+    resource_class = UserPaymentResource
     list_display = ["user", "plan", "screenshoot", "updated_at", "is_verified"]
     list_filter = ["is_verified", "plan"]
+    list_per_page = 20
 
-
-admin.site.register(models.User, UserAdmin)
-admin.site.register(models.Plan, UserPlanAdmin)
-admin.site.register(models.UserPayment, UserPaymentAdmin)

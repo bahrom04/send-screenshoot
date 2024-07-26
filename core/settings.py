@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -131,4 +132,3 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
-

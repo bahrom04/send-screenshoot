@@ -8,6 +8,9 @@ aiogram==3.6.0
 # Django
 Django==4.2.14
 pillow==10.3.0
-
+django-import-export
+openpyxl
+xlrd
+xlwt
 # Jazzmin
 django-jazzmin
