@@ -8,11 +8,14 @@ from django.utils.html import format_html
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ["user_id", "username", "current_plan", "updated_at"]
+    list_filter = ["current_plan"]
+    search_fields = ['user_id', "username", "first_name"]
+
 
 
 class UserPlanAdmin(admin.ModelAdmin):
     list_display = ["title", "amount", "telegram_link"]
-
+    
     change_form_template = "admin/change_form.html"
 
     def get_urls(self):
@@ -36,6 +39,7 @@ class UserPlanAdmin(admin.ModelAdmin):
 
 class UserPaymentAdmin(admin.ModelAdmin):
     list_display = ["user", "plan", "screenshoot", "updated_at", "is_verified"]
+    list_filter = ["is_verified", "plan"]
 
 
 admin.site.register(models.User, UserAdmin)
