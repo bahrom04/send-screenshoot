@@ -12,4 +12,7 @@ sudo nano /etc/systemd/system/gunicorn-secondapp.service
 ## Restart the service: Restart the service to apply the changes to the script.
 ```
 sudo systemctl restart uravo-bot.service
+sudo systemctl restart gunicorn
+sudo systemctl restart nginx
+
 ```
