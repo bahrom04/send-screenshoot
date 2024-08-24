@@ -21,6 +21,7 @@ class UserAdmin(ExportActionModelAdmin):
     list_filter = ["current_plan"]
     search_fields = ['user_id', "username", "first_name"]
     list_per_page = 20
+    list_select_related = ("current_plan", )
 
 
 class PlanResouces(resources.ModelResource):
@@ -47,7 +48,7 @@ class UserPlanAdmin(ExportActionModelAdmin):
         original_object = self.get_object(request, object_id)
         if original_object:
             new_object = original_object
-            new_object.pk = None  # Set pk to None to create a new instance
+            new_object.pk = None
             new_object.save()
             self.message_user(request, "Object duplicated successfully.")
             return redirect(f"../../{new_object.pk}/change/")
@@ -65,4 +66,5 @@ class UserPaymentAdmin(ExportActionModelAdmin):
     list_display = ["user", "plan", "screenshoot", "updated_at", "is_verified"]
     list_filter = ["is_verified", "plan"]
     list_per_page = 20
+    list_select_related = ("user", "plan", )
 
